@@ -49,12 +49,18 @@ def printInfo():
 
 
 # Get fofa results
-def parseResult(query):
+def parseResult(query, maxresults):
     results = []
     pages = init.get_data(query)['size'] // 100 + 1
     print(f'pages: {pages}')
     for page in range(1, pages + 1):
-        results += init.get_data(query, page, 'host,ip,port,title')['results']
+        try:
+            results += init.get_data(query, page, 'host,ip,port,title')['results']
+        except:
+            pass
+
+        if len(results) >= maxresults:
+            break
     
     return results
 
@@ -108,7 +114,8 @@ def Help():
         \t-q : Search query.\n
         \t-f : Output file type. Support txt, html, csv. Default is txt. 'all' is save output with all file type\n
         \t-o : Output file name. Default is "query + current time".\n
-        \t-p : Print user infomation.
+        \t-p : Print user infomation.\n
+        \t-n : Get the max results in this search. Default is 10000.\n
         example:\n
         \tpython {sys.argv[0]} -q header="thinkphp" -f csv -o test
         ''')
@@ -117,6 +124,7 @@ def Help():
 if __name__ == '__main__':
     filetype = 'txt'
     filename = ''
+    maxresults = 10000
     if '-p' in sys.argv:
         printInfo()
         exit()
@@ -131,9 +139,12 @@ if __name__ == '__main__':
     if '-o' in sys.argv:
         filename = checkArg('-o')
 
+    if '-n' in sys.argv:
+        maxresults = int(checkArg('-n'))
+
     query = checkArg('-q')
     filename = filename if filename else query + '_' + time.strftime('%Y%m%d%H%M', time.localtime())
-    res = parseResult(query)
+    res = parseResult(query, maxresults)
     checkFolder()
     if filetype == 'all':
         for t in ['txt', 'html', 'csv']:
