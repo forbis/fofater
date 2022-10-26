@@ -14,3 +14,4 @@ git clone https://github.com/fofapro/fofa-py.git
 cd fofa-py   
 python setup.py install
 ```
+then replace the `client.py` file.
